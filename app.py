@@ -114,41 +114,57 @@ def prediction(input_data):
     return predicted_class, predicted_class_proba
 
 st.set_page_config(page_title="Obesity Level Predictor", layout="centered")
-st.title("🧠 Obesity Level Prediction App")
+st.title("🏋️‍♂️ Obesity Level Prediction App")
 st.markdown("Fill in the following details to predict your obesity level.")
 
 # Input fields
-gender = st.radio("Gender", ['Male', 'Female'])
+st.markdown("### **Age**")
+age = st.number_input("", min_value=14, max_value=60, step=1)
 
-age = st.number_input("Age", min_value=1, max_value=120, step=1)
+st.markdown("### **Height (in meters)**")
+height = st.number_input("", min_value=1.40, max_value=2.0, step=0.01)
 
-height = st.number_input("Height (in meters)", min_value=0.5, max_value=2.5, step=0.01)
+st.markdown("### **Weight (in kilograms)**")
+weight = st.number_input("", min_value=39.0, max_value=170.0, step=0.1)
 
-weight = st.number_input("Weight (in kilograms)", min_value=10.0, max_value=300.0, step=0.1)
+st.markdown("### **Gender**")
+gender = st.radio("", ['Male', 'Female'], horizontal=True)
 
-family_history = st.radio("Family History with Overweight", ['yes', 'no'])
+st.markdown("### **Family History with Overweight**")
+family_history = st.radio(" ", ['No', 'Yes'], horizontal=True)
 
-high_cal = st.radio("High Calorie Consumption", ['yes', 'no'])
+st.markdown("### **High Calorie Consumption**")
+high_cal = st.radio("  ", ['No', 'Yes'], horizontal=True)
 
-vegetable = st.radio("Vegetable Consumption", [0, 1, 2])
+st.markdown("### **Vegetable Consumption**")
+vegetable = st.radio("", ['Low', 'Medium', 'High'], horizontal=True) # map from 0 to 2
 
-meals = st.radio("Number of Meals per Day", [1, 2, 3, 4])
+st.markdown("### **Number of Meals per Day**")
+meals = st.radio("", [1, 2, 3, 4], horizontal=True)
 
-eating_between = st.radio("Eating Between Meals", ['no', 'sometimes', 'frequently', 'always'])
+st.markdown("### **Eating Between Meals**")
+eating_between = st.radio("", ['No', 'Sometimes', 'Frequently', 'Always'], horizontal=True)
 
-smoke = st.radio("Do You Smoke?", ['yes', 'no'])
+st.markdown("### **Do You Smoke?**")
+smoke = st.radio("      ", ['No', 'Yes'], horizontal=True)
 
-water = st.radio("Daily Water Consumption", [0, 1, 2])
+st.markdown("### **Daily Water Consumption**")
+water = st.radio(" ", ['Low', 'Medium', 'High'], horizontal=True) # map from 0 to 2
 
-calorie_monitoring = st.radio("Do You Monitor Your Calorie Intake?", ['yes', 'no'])
+st.markdown("### **Do You Monitor Your Calorie Intake?**")
+calorie_monitoring = st.radio("             ", ['No', 'Yes'], horizontal=True)
 
-physical_activity = st.radio("Physical Activity Level", [0, 1, 2, 3])
+st.markdown("### **Physical Activity Level**")
+physical_activity = st.radio("", ['Sedentary', 'Light Activity', 'Moderate Activity', 'High Activity'], horizontal=True) # map from 0 to 3
 
-screen_time = st.radio("Daily Screen Time", [0, 1, 2])
+st.markdown("### **Daily Screen Time**")
+screen_time = st.radio("          ", ['Low', 'Medium', 'High'], horizontal=True) # map to 0 to 2
 
-alcohol = st.radio("Alcohol Consumption", ['no', 'sometimes', 'frequently'])
+st.markdown("### **Alcohol Consumption**")
+alcohol = st.radio("", ['No', 'Sometimes', 'Frequently'], horizontal=True)
 
-transport = st.radio("Primary Transportation Mode", ['Walking', 'Bike', 'Motorbike', 'Automobile', 'Public_Transportation'])
+st.markdown("### **Primary Transportation Mode**")
+transport = st.radio("", ['Walking', 'Bike', 'Motorbike', 'Automobile', 'Public_Transportation'], horizontal=True)
 
 # Predict Button
 if st.button("Predict Obesity Level"):
@@ -158,6 +174,27 @@ if st.button("Predict Obesity Level"):
                                    smoke, water, calorie_monitoring, physical_activity, screen_time, alcohol, transport]):
         st.error("⚠️ Please fill out all fields before submitting.")
     else:
+        # in case of vegetable
+        if vegetable == 'Low': vegetable = 0
+        if vegetable == 'Medium': vegetable = 1
+        if vegetable == 'High': vegetable = 2
+
+        # in case of water
+        if water == 'Low': water = 0
+        if water == 'Medium': water = 1
+        if water == 'High': water = 2
+        
+        # in case of physical_activity
+        if physical_activity == 'Sedentary': physical_activity = 0
+        if physical_activity == 'Light Activity': physical_activity = 1
+        if physical_activity == 'Moderate Activity': physical_activity = 2
+        if physical_activity == 'High Activity': physical_activity = 3
+
+        # in case of screen_time
+        if screen_time == 'Low': screen_time = 0
+        if screen_time == 'Medium': screen_time = 1
+        if screen_time == 'High': screen_time = 2
+
         # Build input DataFrame
         input_data = pd.DataFrame([[
             gender, age, height, weight, family_history, high_cal, vegetable,
@@ -171,14 +208,57 @@ if st.button("Predict Obesity Level"):
             'alcohole_consumption', 'transportation_mode'
         ])
 
-        st.markdown("### 🧾 Input Data")
-        st.dataframe(input_data)
-
         # Prediction
         predicted_class, predicted_class_proba = prediction(input_data)
+        class_map = {0:"Sufficient_Weight", 1:"Normal_Weight", 2:"Overweight_I", 3:"Overweight_II", 
+                    4:"Obesity_I", 5:"Obesity_II", 6:"Obesity_III"}
+        class_name = class_map[predicted_class]
         
-        st.write(predicted_class)
-        st.write(predicted_class_proba)
+        st.markdown(f"""
+    <style>
+        body {{
+            background-color: black; /* Set the background to black */
+            color: white; /* Set text color to white for contrast */
+        }}
+        table {{
+            width: 90%; /* Make the table wider */
+            border-collapse: collapse;
+            font-size: 24px; /* Make text larger */
+            margin: auto; /* Center the table */
+        }}
+        th, td {{
+            padding: 20px; /* Increase padding for larger space */
+            text-align: left;
+            border: 1px solid #00796B; /* Add border with teal color */
+        }}
+        th {{
+            background-color: #00796B; /* Teal color for headers */
+            color: white; /* White text color */
+        }}
+        tr:nth-child(even) {{
+            background-color: #000000; /* Light teal color for even rows */
+        }}
+        tr:nth-child(odd) {{
+            background-color: #000000; /* White color for odd rows */
+        }}
+        tr:hover {{
+            background-color: #b2dfdb; /* Light hover effect */
+        }}
+    </style>
+    <table>
+        <tr>
+            <th>Prediction</th>
+            <th>Confidence</th>
+        </tr>
+        <tr>
+            <td>{class_name}</td>
+            <td>{round(predicted_class_proba * 100, 2)}%</td>
+        </tr>
+    </table>
+""", unsafe_allow_html=True)
+
+
+
         
         
 
