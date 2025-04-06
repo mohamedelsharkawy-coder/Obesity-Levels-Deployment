@@ -210,7 +210,7 @@ if st.button("Predict Obesity Level"):
 
         # Prediction
         predicted_class, predicted_class_proba = prediction(input_data)
-        class_map = {0:"Sufficient_Weight", 1:"Normal_Weight", 2:"Overweight_I", 3:"Overweight_II", 
+        class_map = {0:"Unsufficient_Weight", 1:"Normal_Weight", 2:"Overweight_I", 3:"Overweight_II", 
                     4:"Obesity_I", 5:"Obesity_II", 6:"Obesity_III"}
         class_name = class_map[predicted_class]
         
